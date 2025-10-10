@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronic Disease Risk Predictor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style2.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+
+<body>
+    <div class="container" id="patientAssessmentContainer">
+        <!-- Navigation Tabs -->
+        <div class="nav-container">
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-target="patientTab">Patient Assessment</div>
+                <div class="nav-tab" data-target="doctorTab">Doctor Dashboard</div>
+            </div>
+        </div>
+
+        <!-- Patient Assessment Section (Default View) -->
+        <div id="patientTab">
+            <!-- Patient Registration Section -->
+            <div id="registrationSection" class="fade-in">
+                <header>
+                    <h1><i class="fas fa-heartbeat"></i> Chronic Disease Screening Registration</h1>
+                    <div class="subtitle">Early detection for diabetes, hypertension, and kidney disease</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 33%"></div>
+                    </div>
+                </header>
+
+                <div class="card">
+                    <h2><i class="fas fa-user-circle"></i> Patient Information</h2>
+                    <form id="patientRegistrationForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="fullName" class="required">
+                                    <i class="fas fa-user"></i>Full Name
+                                </label>
+                                <input type="text" id="fullName" name="fullName" required
+                                    placeholder="Enter your full name">
+                                <div class="error-message" id="fullNameError">Please enter your full name</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contactNumber" class="required">
+                                    <i class="fas fa-phone"></i>Contact Number
+                                </label>
+                                <input type="tel" id="contactNumber" name="contactNumber" required
+                                    placeholder="Enter your phone number">
+                                <div class="error-message" id="contactNumberError">Please enter a valid phone number
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="age" class="required">
+                                    <i class="fas fa-birthday-cake"></i>Age (years)
+                                </label>
+                                <input type="number" id="age" name="age" min="1" max="120" required
+                                    placeholder="Enter your age">
+                                <div class="error-message" id="ageError">Age must be between 1 and 120</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gender" class="required">
+                                    <i class="fas fa-venus-mars"></i>Gender
+                                </label>
+                                <select id="gender" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="0">Female</option>
+                                    <option value="1">Male</option>
+                                </select>
+                                <div class="error-message" id="genderError">Please select your gender</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="height" class="required">
+                                    <i class="fas fa-ruler-vertical"></i>Height (cm)
+                                </label>
+                                <input type="number" id="height" name="height" min="0" max="250" required
+                                    placeholder="Enter height in cm">
+                                <div class="error-message" id="heightError">Height must be between 0cm and 250cm</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="weight" class="required">
+                                    <i class="fas fa-weight-scale"></i>Weight (kg)
+                                </label>
+                                <input type="number" id="weight" name="weight" min="0" max="300" step="0.1" required
+                                    placeholder="Enter weight in kg">
+                                <div class="error-message" id="weightError">Weight must be between 0kg and 300kg</div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="predict-btn">
+                            <i class="fas fa-arrow-right"></i>
+                            <span class="btn-text">Continue to Health Assessment</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Health Assessment Section (Initially Hidden) -->
+            <div id="assessmentSection" style="display: none;" class="fade-in">
+                <header>
+                    <h1><i class="fas fa-stethoscope"></i> Chronic Disease Risk Predictor</h1>
+                    <div class="subtitle">AI-powered health risk assessment using machine learning</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 66%"></div>
+                    </div>
+                </header>
+
+                <div class="patient-info-bar">
+                    <span id="patientNameDisplay"><i class="fas fa-user"></i> </span>
+                    <span id="patientContactDisplay"><i class="fas fa-phone"></i> </span>
+                    <span id="patientAgeDisplay"><i class="fas fa-birthday-cake"></i> </span>
+                    <span id="patientGenderDisplay"><i class="fas fa-venus-mars"></i> </span>
+                </div>
+
+                <div class="main-content">
+                    <div class="card-1">
+                        <h2><i class="fas fa-clipboard-list"></i> Health Information</h2>
+                        <form id="predictionForm">
+                            <!-- Disease Selection Section -->
+                            <div class="disease-selection-container">
+                                <h3 class="disease-section-title">
+                                    <i class="fas fa-heartbeat"></i> Disease Parameter Form
+                                </h3>
+
+                                <div class="disease-form-card">
+                                    <div class="form-group">
+                                        <label for="diseaseSelect" class="required disease-label">
+                                            Select Disease
+                                        </label>
+                                        <select id="diseaseSelect" name="diseaseSelect" class="disease-dropdown"
+                                            required>
+                                            <option value="">-- Choose a Disease --</option>
+                                            <option value="diabetes">Diabetes</option>
+                                            <option value="kidney">Chronic Kidney Disease</option>
+                                        </select>
+                                        <div class="error-message" id="diseaseSelectError">Please select a disease type
+                                        </div>
+                                    </div>
+
+                                    <!-- Dynamic parameter info will appear here -->
+                                    <div id="diseaseInfoPanel" class="disease-info-panel" style="display: none;">
+                                        <div class="info-badge">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span id="diseaseInfoText">Select a disease to see specific assessment
+                                                parameters</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-divider"></div>
+
+                            <!-- Common Fields - Only Systolic, Diastolic BP and Cholesterol -->
+                            <h3
+                                style="color: #9b59b6; margin: 20px 0 15px 0; border-bottom: 2px solid #9b59b6; padding-bottom: 8px;">
+                                <i class="fas fa-heartbeat"></i> Common Health Parameters
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="systolic_bp" class="required">
+                                        <i class="fas fa-heart-pulse"></i>Systolic BP (mmHg)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">The pressure in your arteries when your heart
+                                                beats (Normal: 90-120 mmHg)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="systolic_bp" name="systolic_bp" min="0" max="250" required
+                                        placeholder="e.g. 120">
+                                    <div class="error-message" id="systolicBpError">Systolic BP must be between 0 and
+                                        250 mmHg</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="diastolic_bp" class="required">
+                                        <i class="fas fa-heart-pulse"></i>Diastolic BP (mmHg)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">The pressure in your arteries when your heart
+                                                rests between beats (Normal: 60-80 mmHg)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="diastolic_bp" name="diastolic_bp" min="0" max="250"
+                                        required placeholder="e.g. 80">
+                                    <div class="error-message" id="diastolicBpError">Diastolic BP must be between 40 and
+                                        150 mmHg</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cholesterol" class="required">
+                                        <i class="fas fa-vial"></i>Total Cholesterol (mg/dL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Total cholesterol level (Desirable: <200
+                                                    mg/dL)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="cholesterol" name="cholesterol" min="0" max="400" required
+                                        placeholder="e.g 180">
+                                    <div class="error-message" id="cholesterolError">Cholesterol must be between 0 and
+                                        400 mg/dL</div>
+                                </div>
+                            </div>
+
+                            <!-- Diabetes Assessment -->
+                            <h3
+                                style="color: #3498db; margin: 30px 0 15px 0; border-bottom: 2px solid #3498db; padding-bottom: 8px;">
+                                <i class="fas fa-syringe"></i> Diabetes Assessment
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="glucose" class="required">
+                                        <i class="fas fa-vial-circle-check"></i>Fasting Glucose (mg/dL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Fasting blood sugar level (Normal: 70-100
+                                                mg/dL)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="glucose" name="glucose" min="0" max="300" required
+                                        placeholder="e.g. 95">
+                                    <div class="error-message" id="glucoseError">Glucose must be between 0 and 300 mg/dL
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="postprandial_glucose">
+                                        <i class="fas fa-vial-circle-check"></i>Postprandial Glucose (mg/dL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Blood sugar level 2 hours after eating (Normal:
+                                                <140 mg/dL)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="postprandial_glucose" name="postprandial_glucose" min="0"
+                                        max="500" placeholder="e.g. 120">
+                                    <div class="error-message" id="postprandialGlucoseError">Postprandial glucose must
+                                        be between 0 and 500 mg/dL</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="hba1c">
+                                        <i class="fas fa-vial-circle-check"></i>HbA1c (%)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Average blood sugar level over 2-3 months (Normal:
+                                                <5.7%)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="hba1c" name="hba1c" min="0" max="20" step="0.1"
+                                        placeholder="e.g. 5.5">
+                                    <div class="error-message" id="hba1cError">HbA1c must be between 0% and 20%</div>
+                                </div>
+
+                                <!-- 🩸 Insulin Level - DIABETES SPECIFIC -->
+                                <div class="form-group">
+                                    <label for="insulinLevel">
+                                        <i class="fas fa-syringe"></i>Insulin Level (µIU/mL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Hormone that regulates blood sugar (Normal: 2-25 µIU/mL)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="insulinLevel" name="insulinLevel" step="0.1" min="0" max="100"
+                                        placeholder="Normal: 2–25 µIU/mL">
+                                    <div class="error-message" id="insulinLevelError">Insulin level must be between 0 and 100 µIU/mL</div>
+                                </div>
+
+                                <!-- 🧬 C-Peptide Level - DIABETES SPECIFIC -->
+                                <div class="form-group">
+                                    <label for="cPeptide">
+                                        <i class="fas fa-dna"></i>C-Peptide Level (ng/mL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Marker of insulin production (Typical: 0.5–2.0 ng/mL)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="cPeptide" name="cPeptide" step="0.1" min="0" max="10"
+                                        placeholder="Typical: 0.5–2.0 ng/mL">
+                                    <div class="error-message" id="cPeptideError">C-Peptide level must be between 0 and 10 ng/mL</div>
+                                </div>
+                            </div>
+
+                            <!-- Kidney Function Assessment -->
+                            <h3
+                                style="color: #e74c3c; margin: 30px 0 15px 0; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">
+                                <i class="fas fa-kidneys"></i> Kidney Function Assessment
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="serum_creatinine" class="required">
+                                        <i class="fas fa-flask-vial"></i>Serum Creatinine (mg/dL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Waste product filtered by kidneys (Normal: 0.6-1.2
+                                                mg/dL)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="serum_creatinine" name="serum_creatinine" min="0" max="15"
+                                        step="0.1" required placeholder="e.g. 1.0">
+                                    <div class="error-message" id="serumCreatinineError">Serum creatinine must be
+                                        between 0 and 15 mg/dL</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="blood_urea_nitrogen" class="required">
+                                        <i class="fas fa-flask-vial"></i>Blood Urea Nitrogen (mg/dL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Measures kidney function (Normal: 7-20
+                                                mg/dL)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="blood_urea_nitrogen" name="blood_urea_nitrogen" min="0"
+                                        max="200" step="0.1" required placeholder="e.g. 15">
+                                    <div class="error-message" id="bunError">BUN must be between 0 and 200 mg/dL</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="gfr" class="required">
+                                        <i class="fas fa-droplet"></i>GFR (mL/min/1.73m²)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Glomerular Filtration Rate - kidney filtering
+                                                capacity (Normal: >90)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="gfr" name="gfr" min="0" max="200" step="0.1" required
+                                        placeholder="e.g. 95">
+                                    <div class="error-message" id="gfrError">GFR must be between 0 and 200</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="urine_albumin">
+                                        <i class="fas fa-prescription-bottle"></i>Urine Albumin (mg/L)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Protein in urine, indicator of kidney damage
+                                                (Normal: <30 mg/L)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="urine_albumin" name="urine_albumin" min="0" max="5000"
+                                        step="0.1" placeholder="e.g. 20">
+                                    <div class="error-message" id="urineAlbuminError">Urine albumin must be between 0
+                                        and 5000 mg/L</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="serum_potassium">
+                                        <i class="fas fa-atom"></i>Serum Potassium (mEq/L)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Electrolyte balance indicator (Normal: 3.5-5.0
+                                                mEq/L)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="serum_potassium" name="serum_potassium" min="0" max="10"
+                                        step="0.1" placeholder="e.g. 4.2">
+                                    <div class="error-message" id="serumPotassiumError">Serum potassium must be between
+                                        0 and 10 mEq/L</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="hemoglobin">
+                                        <i class="fas fa-tint"></i>Hemoglobin (g/dL)
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="tooltiptext">Red blood cell count (Normal: 12-16 g/dL women,
+                                                14-18 g/dL men)</span>
+                                        </div>
+                                    </label>
+                                    <input type="number" id="hemoglobin" name="hemoglobin" min="0" max="25" step="0.1"
+                                        placeholder="e.g. 14.5">
+                                    <div class="error-message" id="hemoglobinError">Hemoglobin must be between 0 and 25
+                                        g/dL</div>
+                                </div>
+                            </div>
+
+                            <!-- Medical History & Lifestyle -->
+                            <h3
+                                style="color: #27ae60; margin: 30px 0 15px 0; border-bottom: 2px solid #27ae60; padding-bottom: 8px;">
+                                <i class="fas fa-notes-medical"></i> Medical History & Lifestyle
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="family_history" class="required">
+                                        <i class="fas fa-dna"></i>Family History of Chronic Disease
+                                    </label>
+                                    <select id="family_history" name="family_history" required>
+                                        <option value="">Select Option</option>
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                    <div class="error-message" id="familyHistoryError">Please select an option</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exercise_hours">
+                                        <i class="fas fa-running"></i>Exercise Hours per Week
+                                    </label>
+                                    <input type="number" id="exercise_hours" name="exercise_hours" min="0" max="40"
+                                        step="0.5" placeholder="e.g 3.5">
+                                    <div class="error-message" id="exerciseError">Exercise hours must be between 0 and
+                                        40</div>
+                                </div>
+                            </div>
+
+                            <div class="nav-buttons">
+                                <button type="button" class="back-btn" id="backToRegistration">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+
+                                <label for="fileUpload" class="upload-btn">
+                                    <i class="fas fa-upload"></i> Upload File
+                                </label>
+                                <input type="file" id="fileUpload" name="fileUpload" style="display: none;">
+
+                                <button type="submit" class="predict-btn">
+                                    <i class="fas fa-brain"></i>
+                                    <span class="btn-text">Predict Risk</span>
+                                    <span class="loading" style="display: none;">Analyzing...</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card" id="resultsSection" style="display: none;">
+                        <h2><i class="fas fa-chart-line"></i> Risk Assessment Results</h2>
+                        <div class="result-card" id="resultCard">
+                            <div class="risk-indicator" id="riskIndicator">
+                                <div class="risk-level" id="riskLevel"></div>
+                                <div class="risk-percentage" id="riskPercentage"></div>
+                            </div>
+                            <div class="prediction-text" id="predictionText"></div>
+                        </div>
+
+                        <div class="recommendations" id="recommendations" style="display: none;">
+                            <h3><i class="fas fa-lightbulb"></i> Health Recommendations</h3>
+                            <ul id="recommendationsList"></ul>
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+
+                        <div class="nav-buttons">
+                            <button type="button" class="back-btn" id="backToAssessment">
+                                <i class="fas fa-arrow-left"></i> Back to Assessment
+                            </button>
+                            <button type="button" class="predict-btn" id="newAssessmentBtn">
+                                <i class="fas fa-plus"></i> New Assessment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card info-section">
+                    <h2><i class="fas fa-info-circle"></i> About This Tool</h2>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h3><i class="fas fa-robot"></i> AI-Powered</h3>
+                            <p>Uses machine learning algorithms trained on electronic health records to assess chronic
+                                disease risk.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3><i class="fas fa-flask"></i> Evidence-Based</h3>
+                            <p>Based on established health indicators including BMI, blood pressure, cholesterol, kidney
+                                markers, and lifestyle factors.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Disclaimer</h3>
+                            <p>This tool is for educational purposes only. Always consult healthcare professionals for
+                                medical advice.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Dashboard Section (Initially Hidden) -->
+    <div id="doctorTab" class="hidden">
+        <div class="doctor-layout">
+            <!-- Sidebar Navigation -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="title">CDS Portal</div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="sidebar-nav-item active" data-section="dashboard">
+                        <i class="fas fa-home icon"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="sidebar-nav-item" data-section="patients">
+                        <i class="fas fa-users icon"></i>
+                        <span>Patients</span>
+                        <span class="badge" id="totalPatientsNav">0</span>
+                    </div>
+                    <div class="sidebar-nav-item" data-section="schedule">
+                        <i class="fas fa-calendar-alt icon"></i>
+                        <span>Schedule</span>
+                        <span class="badge" id="totalAppointmentsNav">0</span>
+                    </div>
+                    <div class="sidebar-nav-item" data-section="analytics">
+                        <i class="fas fa-chart-bar icon"></i>
+                        <span>Analytics</span>
+                    </div>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <div class="sidebar-footer-text">
+                        Chronic Disease Screening v2.0
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Header -->
+                <div class="main-header">
+                    <div class="search-bar">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" placeholder="Search patients, appointments..." id="globalSearch">
+                    </div>
+
+                    <div class="header-actions">
+                        <div class="user-profile">
+                            <div class="user-avatar">AK</div>
+                            <div class="user-info">
+                                <h4>Dr. Asfia Kousar</h4>
+                                <p>Internal Medicine</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content -->
+                <div class="dashboard-content">
+                    <!-- Main Dashboard View -->
+                    <div id="dashboardView">
+                        <!-- Stats Grid -->
+                        <div class="dashboard-grid">
+                            <div class="stat-card primary">
+                                <div class="stat-header">
+                                    <div class="stat-icon primary">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stat-title">Total Patients</div>
+                                </div>
+                                <div class="stat-value" id="totalPatients">0</div>
+                                <div class="stat-change positive" id="totalPatientsChange">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+12% from last month</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-card success">
+                                <div class="stat-header">
+                                    <div class="stat-icon success">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <div class="stat-title">Today's Assessments</div>
+                                </div>
+                                <div class="stat-value" id="todayAssessments">0</div>
+                                <div class="stat-change positive" id="todayAssessmentsChange">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+8% from last month</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-card warning">
+                                <div class="stat-header">
+                                    <div class="stat-icon warning">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="stat-title">Today's Appointments</div>
+                                </div>
+                                <div class="stat-value" id="todayAppointments">0</div>
+                                <div class="stat-change positive" id="todayAppointmentsChange">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+5 today</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-card danger">
+                                <div class="stat-header">
+                                    <div class="stat-icon danger">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div class="stat-title">Average Risk Score</div>
+                                </div>
+                                <div class="stat-value" id="avgRisk">0%</div>
+                                <div class="stat-change neutral" id="avgRiskChange">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>-3% from last month</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart Section -->
+                        <div class="card">
+                            <h2><i class="fas fa-chart-area"></i> Risk Assessment Overview</h2>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patients View (Initially Hidden) -->
+                    <div id="patientsView" style="display: none;">
+                        <div class="card">
+                            <h2><i class="fas fa-users"></i> All Patients</h2>
+
+                            <!-- Filter Bar -->
+                            <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                                <input type="text"
+                                    style="flex-grow: 1; min-width: 200px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px;"
+                                    id="patientSearch" placeholder="Search by name or contact...">
+                                <select
+                                    style="min-width: 150px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; background: white;"
+                                    id="riskFilter">
+                                    <option value="all">All Risk Levels</option>
+                                    <option value="low">Low Risk</option>
+                                    <option value="moderate">Moderate Risk</option>
+                                    <option value="high">High Risk</option>
+                                </select>
+                                <select
+                                    style="min-width: 150px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; background: white;"
+                                    id="genderFilter">
+                                    <option value="all">All Genders</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                                <button
+                                    style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; background: var(--primary-color); color: white;"
+                                    id="applyFilters">
+                                    <i class="fas fa-filter"></i> Apply Filters
+                                </button>
+                            </div>
+
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Age</th>
+                                            <th>Gender</th>
+                                            <th>Contact</th>
+                                            <th>Risk Level</th>
+                                            <th>GFR</th>
+                                            <th>Creatinine</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="patientsTableBody">
+                                        <!-- Patient data will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule View (Initially Hidden) -->
+                    <div id="scheduleView" style="display: none;">
+                        <!-- Schedule Navigation Tabs -->
+                        <div class="schedule-tabs">
+                            <div class="schedule-tab active" data-schedule-view="calendar">
+                                <i class="fas fa-calendar-alt"></i> Calendar View
+                            </div>
+                            <div class="schedule-tab" data-schedule-view="appointments">
+                                <i class="fas fa-list"></i> Appointments
+                            </div>
+                            <div class="schedule-tab" data-schedule-view="add-appointment">
+                                <i class="fas fa-plus"></i> New Appointment
+                            </div>
+                        </div>
+
+                        <!-- Calendar View -->
+                        <div id="calendarView" class="schedule-content">
+                            <div class="calendar-container">
+                                <div class="calendar-header">
+                                    <div class="calendar-nav">
+                                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                                        <button id="todayBtn">Today</button>
+                                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                                    </div>
+                                    <div class="calendar-title" id="currentMonth">January 2024</div>
+                                    <div class="calendar-nav">
+                                        <button id="newAppointmentBtn">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="calendar-grid" id="calendarGrid">
+                                    <!-- Calendar days will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appointments List View -->
+                        <div id="appointmentsView" class="schedule-content" style="display: none;">
+                            <div class="card">
+                                <h2><i class="fas fa-list"></i> All Appointments</h2>
+
+                                <!-- Filter Bar -->
+                                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                                    <input type="date"
+                                        style="min-width: 150px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px;"
+                                        id="appointmentDateFilter">
+                                    <select
+                                        style="min-width: 150px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; background: white;"
+                                        id="appointmentStatusFilter">
+                                        <option value="all">All Status</option>
+                                        <option value="scheduled">Scheduled</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                    <select
+                                        style="min-width: 150px; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; background: white;"
+                                        id="appointmentPriorityFilter">
+                                        <option value="all">All Priorities</option>
+                                        <option value="high">High Priority</option>
+                                        <option value="medium">Medium Priority</option>
+                                        <option value="low">Low Priority</option>
+                                    </select>
+                                </div>
+
+                                <div id="appointmentsList">
+                                    <!-- Appointments will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Appointment View -->
+                        <div id="addAppointmentView" class="schedule-content" style="display: none;">
+                            <div class="schedule-form">
+                                <h2><i class="fas fa-plus"></i> Schedule New Appointment</h2>
+                                <form id="appointmentForm">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="appointmentPatientName" class="required">
+                                                <i class="fas fa-user"></i> Patient Name
+                                            </label>
+                                            <input type="text" id="appointmentPatientName" name="patientName" required
+                                                placeholder="Enter patient name">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="appointmentContact" class="required">
+                                                <i class="fas fa-phone"></i> Contact Number
+                                            </label>
+                                            <input type="tel" id="appointmentContact" name="contact" required
+                                                placeholder="Enter contact number">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="appointmentDate" class="required">
+                                                <i class="fas fa-calendar"></i> Date
+                                            </label>
+                                            <input type="date" id="appointmentDate" name="date" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="appointmentTime" class="required">
+                                                <i class="fas fa-clock"></i> Time
+                                            </label>
+                                            <select id="appointmentTime" name="time" required>
+                                                <option value="">Select Time</option>
+                                                <option value="09:00">09:00 AM</option>
+                                                <option value="09:30">09:30 AM</option>
+                                                <option value="10:00">10:00 AM</option>
+                                                <option value="10:30">10:30 AM</option>
+                                                <option value="11:00">11:00 AM</option>
+                                                <option value="11:30">11:30 AM</option>
+                                                <option value="14:00">02:00 PM</option>
+                                                <option value="14:30">02:30 PM</option>
+                                                <option value="15:00">03:00 PM</option>
+                                                <option value="15:30">03:30 PM</option>
+                                                <option value="16:00">04:00 PM</option>
+                                                <option value="16:30">04:30 PM</option>
+                                                <option value="17:00">05:00 PM</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="appointmentType" class="required">
+                                                <i class="fas fa-stethoscope"></i> Appointment Type
+                                            </label>
+                                            <select id="appointmentType" name="type" required>
+                                                <option value="">Select Type</option>
+                                                <option value="consultation">General Consultation</option>
+                                                <option value="follow-up">Follow-up</option>
+                                                <option value="screening">Health Screening</option>
+                                                <option value="emergency">Emergency</option>
+                                                <option value="routine">Routine Checkup</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="appointmentPriority">
+                                                <i class="fas fa-flag"></i> Priority
+                                            </label>
+                                            <select id="appointmentPriority" name="priority">
+                                                <option value="low">Low Priority</option>
+                                                <option value="medium" selected>Medium Priority</option>
+                                                <option value="high">High Priority</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="appointmentNotes">
+                                            <i class="fas fa-notes-medical"></i> Notes
+                                        </label>
+                                        <textarea id="appointmentNotes" name="notes" rows="3"
+                                            placeholder="Additional notes or reason for appointment"></textarea>
+                                    </div>
+
+                                    <div class="nav-buttons">
+                                        <button type="button" class="back-btn" id="cancelAppointment">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                        <button type="submit" class="predict-btn">
+                                            <i class="fas fa-calendar-plus"></i> Schedule Appointment
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics View (Initially Hidden) -->
+                    <div id="analyticsView" style="display: none;">
+                        <div class="card">
+                            <h2><i class="fas fa-chart-bar"></i> Analytics & Insights</h2>
+
+                            <div class="dashboard-grid">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <div class="stat-icon primary">
+                                            <i class="fas fa-percentage"></i>
+                                        </div>
+                                        <div class="stat-title">Low Risk Patients</div>
+                                    </div>
+                                    <div class="stat-value" id="lowRiskCount">0</div>
+                                    <div class="stat-change positive">
+                                        <span id="lowRiskPercentage">0%</span>
+                                    </div>
+                                </div>
+
+                                <div class="stat-card warning">
+                                    <div class="stat-header">
+                                        <div class="stat-icon warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="stat-title">Moderate Risk</div>
+                                    </div>
+                                    <div class="stat-value" id="moderateRiskCount">0</div>
+                                    <div class="stat-change neutral">
+                                        <span id="moderateRiskPercentage">0%</span>
+                                    </div>
+                                </div>
+
+                                <div class="stat-card danger">
+                                    <div class="stat-header">
+                                        <div class="stat-icon danger">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </div>
+                                        <div class="stat-title">High Risk</div>
+                                    </div>
+                                    <div class="stat-value" id="highRiskCount">0</div>
+                                    <div class="stat-change negative">
+                                        <span id="highRiskPercentage">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chart-container">
+                                <canvas id="analyticsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Details Modal -->
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2 id="modalTitle">Appointment Details</h2>
+            <div id="modalBody">
+                <!-- Appointment details will be populated here -->
+            </div>
+            <div class="nav-buttons">
+                <button type="button" class="btn-small btn-edit" id="editAppointmentBtn">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button type="button" class="btn-small btn-delete" id="deleteAppointmentBtn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button type="button" class="btn-small btn-complete" id="completeAppointmentBtn">
+                    <i class="fas fa-check"></i> Mark Complete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
