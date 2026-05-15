@@ -123,8 +123,4 @@ This project demonstrates the effectiveness of ensemble machine learning techniq
 
 ---
 
-# Authors
 
-* Your Name
-* Project Guide Name
-* Institution Name
